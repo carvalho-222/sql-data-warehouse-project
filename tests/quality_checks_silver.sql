@@ -34,9 +34,10 @@ HAVING COUNT(*) > 1 OR cst_id IS NULL;
 SELECT 
     cst_key 
 FROM silver.crm_cust_info
-WHERE cst_key != TRIM(cst_key);
+WHERE cst_key <> TRIM(cst_key);
 
 -- Data Standardization & Consistency
+-- Expectation: Single, Married or n/a
 SELECT DISTINCT 
     cst_marital_status 
 FROM silver.crm_cust_info;
@@ -58,7 +59,7 @@ HAVING COUNT(*) > 1 OR prd_id IS NULL;
 SELECT 
     prd_nm 
 FROM silver.crm_prd_info
-WHERE prd_nm != TRIM(prd_nm);
+WHERE prd_nm <> TRIM(prd_nm);
 
 -- Check for NULLs or Negative Values in Cost
 -- Expectation: No Results
@@ -68,6 +69,7 @@ FROM silver.crm_prd_info
 WHERE prd_cost < 0 OR prd_cost IS NULL;
 
 -- Data Standardization & Consistency
+-- Expectation: No nulls
 SELECT DISTINCT 
     prd_line 
 FROM silver.crm_prd_info;
@@ -88,7 +90,7 @@ SELECT
     NULLIF(sls_due_dt, 0) AS sls_due_dt 
 FROM bronze.crm_sales_details
 WHERE sls_due_dt <= 0 
-    OR LEN(sls_due_dt) != 8 
+    OR LEN(sls_due_dt) <> 8 
     OR sls_due_dt > 20500101 
     OR sls_due_dt < 19000101;
 
@@ -107,7 +109,7 @@ SELECT DISTINCT
     sls_quantity,
     sls_price 
 FROM silver.crm_sales_details
-WHERE sls_sales != sls_quantity * sls_price
+WHERE sls_sales <> sls_quantity * sls_price
    OR sls_sales IS NULL 
    OR sls_quantity IS NULL 
    OR sls_price IS NULL
@@ -124,10 +126,11 @@ ORDER BY sls_sales, sls_quantity, sls_price;
 SELECT DISTINCT 
     bdate 
 FROM silver.erp_cust_az12
-WHERE bdate < '1924-01-01' 
+WHERE bdate < '1926-01-01' 
    OR bdate > GETDATE();
 
 -- Data Standardization & Consistency
+-- Expectation: Male, Female, n/a
 SELECT DISTINCT 
     gen 
 FROM silver.erp_cust_az12;
@@ -136,6 +139,7 @@ FROM silver.erp_cust_az12;
 -- Checking 'silver.erp_loc_a101'
 -- ====================================================================
 -- Data Standardization & Consistency
+-- Expectation: Country names with no abreviations, no nulls (changed to n/a)
 SELECT DISTINCT 
     cntry 
 FROM silver.erp_loc_a101
@@ -154,6 +158,7 @@ WHERE cat != TRIM(cat)
    OR maintenance != TRIM(maintenance);
 
 -- Data Standardization & Consistency
+-- Expectation: No or Yes
 SELECT DISTINCT 
     maintenance 
 FROM silver.erp_px_cat_g1v2;
